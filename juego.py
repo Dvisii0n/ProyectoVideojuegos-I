@@ -2,6 +2,7 @@ import pygame
 import pymunk
 import pymunk.pygame_util
 from nivelUno import NivelUno
+from jugador import Jugador
 
 
 class Juego:
@@ -13,18 +14,46 @@ class Juego:
         self.reloj = pygame.time.Clock()
         self.FPS = fps
         self.pantalla = pygame.display.set_mode((self.ANCHO, self.ALTO))
-        # cambiar estar propiedad por otro objeto de nivel si se quiere cambiar de nivel
-        self.nivel = NivelUno(self.pantalla)
+
+        self.PISO_COLISION = 1
+        self.JUGADOR_COLISION = 2
+        # cambiar esta propiedad por otro objeto de nivel si se quiere cambiar de nivel
+        self.nivel = NivelUno(self.pantalla, self.PISO_COLISION)
+
+        posicion_inicial = (100, self.ALTO - (self.nivel.piso.radius + 50))
+        self.jugador = Jugador(
+            posicion_inicial=posicion_inicial, colision_tipo=self.JUGADOR_COLISION
+        )
 
     def renderizar(self):
         self.nivel.dibujar()
 
     def manejar_eventos(self):
+
+        self.nivel.space.on_collision(
+            self.JUGADOR_COLISION,
+            self.PISO_COLISION,
+            begin=self.jugador.set_esta_en_piso,
+        )
+
+        teclas_presionadas = pygame.key.get_pressed()
+        if teclas_presionadas[pygame.K_SPACE] and self.jugador.en_piso:
+            self.jugador.saltar()
+
+        if teclas_presionadas[pygame.K_d]:
+            self.jugador.mover("DER")
+        elif teclas_presionadas[pygame.K_a]:
+            self.jugador.mover("IZQ")
+
+        else:
+            self.jugador.parar()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.ejecutando = False
 
     def ejecutar(self):
+        self.nivel.agregar_a_space(self.jugador.cuerpo, self.jugador.forma)
 
         while self.ejecutando:
             self.manejar_eventos()
