@@ -5,7 +5,7 @@ from nivelUno import NivelUno
 from jugador import Jugador
 from camara import Camara
 
-#joto el q use IA
+#puto si usas IA 
 
 
 class Juego:
