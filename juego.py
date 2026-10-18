@@ -3,6 +3,7 @@ import pymunk
 import pymunk.pygame_util
 from nivelUno import NivelUno
 from jugador import Jugador
+from camara import Camara
 
 
 class Juego:
@@ -17,12 +18,18 @@ class Juego:
 
         self.PISO_COLISION = 1
         self.JUGADOR_COLISION = 2
-        # cambiar esta propiedad por otro objeto de nivel si se quiere cambiar de nivel
-        self.nivel = NivelUno(self.pantalla, self.PISO_COLISION)
 
-        posicion_inicial = (100, self.ALTO - (self.nivel.piso.radius + 50))
         self.jugador = Jugador(
-            posicion_inicial=posicion_inicial, colision_tipo=self.JUGADOR_COLISION
+            colision_tipo=self.JUGADOR_COLISION,
+        )
+
+        self.camara = Camara(jugador=self.jugador)
+
+        # cambiar esta propiedad por otro objeto de nivel si se quiere cambiar de nivel
+        self.nivel = NivelUno(
+            pantalla=self.pantalla,
+            camara=self.camara,
+            piso_colision_tipo=self.PISO_COLISION,
         )
 
     def renderizar(self):
@@ -53,6 +60,12 @@ class Juego:
                 self.ejecutando = False
 
     def ejecutar(self):
+
+        jugador_posicion_inicial = (
+            self.ANCHO // 2,
+            self.ALTO - (self.nivel.piso.radius + 50),
+        )
+        self.jugador.set_posicion_inicial(jugador_posicion_inicial)
         self.nivel.agregar_a_space(self.jugador.cuerpo, self.jugador.forma)
 
         while self.ejecutando:
@@ -60,6 +73,8 @@ class Juego:
             self.renderizar()
 
             self.nivel.space.step(1 / self.FPS)
+
+            self.camara.actualizar()
             pygame.display.flip()
             self.reloj.tick(self.FPS)
 
