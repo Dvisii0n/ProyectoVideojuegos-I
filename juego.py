@@ -5,6 +5,8 @@ from nivelUno import NivelUno
 from jugador import Jugador
 from camara import Camara
 
+#joto el q use IA
+
 
 class Juego:
     def __init__(self, ancho=1280, alto=720, fps=60):
