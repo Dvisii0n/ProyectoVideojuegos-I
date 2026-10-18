@@ -22,10 +22,10 @@ class Jugador:
         self.estado = "IDLE"
         self.en_piso = True
 
-        self.cuerpo.position = posicion_inicial
         self.forma.collision_type = colision_tipo
 
-    def set_posicion(self, posicion):
+    def set_posicion_inicial(self, posicion):
+        self.posicion_inicial = posicion
         self.cuerpo.position = posicion
 
     def set_esta_en_piso(self, arbiter, space, data):
