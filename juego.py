@@ -5,7 +5,7 @@ from nivelUno import NivelUno
 from jugador import Jugador
 from camara import Camara
 
-#puto si usas IA 
+#si usas IA eres puto
 
 
 class Juego:
