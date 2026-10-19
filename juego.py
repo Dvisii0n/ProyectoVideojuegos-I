@@ -74,7 +74,9 @@ class Juego:
             self.manejar_eventos()
             self.renderizar()
 
-            self.nivel.space.step(1 / self.FPS)
+            substeps = 4
+            for _ in range(substeps):
+                self.nivel.space.step(1 / self.FPS / substeps)
 
             self.camara.actualizar()
             pygame.display.flip()

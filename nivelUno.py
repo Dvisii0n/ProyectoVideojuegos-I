@@ -1,4 +1,5 @@
 import pymunk
+from obstaculo import Obstaculo
 
 
 class NivelUno:
@@ -22,6 +23,19 @@ class NivelUno:
 
         self.space.add(self.piso)
 
+        
+        self.obstaculos = [
+            Obstaculo(
+                space=self.space,
+                posicion=(
+                    self.pantalla.width // 2 + 400,
+                    self.pantalla.height - 100 - 50,
+                ),
+                colision_tipo=piso_colision_tipo,
+                dimension=(100, 100),
+            )
+        ]
+
     def agregar_a_space(self, *cuerpos):
         for c in cuerpos:
             self.space.add(c)
@@ -32,3 +46,5 @@ class NivelUno:
             self.camara.posicion["x"], self.camara.posicion["y"]
         )
         self.space.debug_draw(self.draw_options)
+        for obstaculo in self.obstaculos:
+            obstaculo.dibujar(self.pantalla, self.camara)
