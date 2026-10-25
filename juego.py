@@ -1,11 +1,7 @@
 import pygame
-import pymunk
-import pymunk.pygame_util
 from nivelUno import NivelUno
 from jugador import Jugador
 from camara import Camara
-
-#si usas IA eres joto
 
 
 class Juego:
@@ -20,9 +16,10 @@ class Juego:
 
         self.PISO_COLISION = 1
         self.JUGADOR_COLISION = 2
+        self.TIPO_COLISIONES = {"PISO": 1, "JUGADOR": 2, "ENEMIGO": 3, "PARED": 4}
 
         self.jugador = Jugador(
-            colision_tipo=self.JUGADOR_COLISION,
+            colision_tipo=self.TIPO_COLISIONES["JUGADOR"],
         )
 
         self.camara = Camara(jugador=self.jugador)
@@ -31,13 +28,15 @@ class Juego:
         self.nivel = NivelUno(
             pantalla=self.pantalla,
             camara=self.camara,
-            piso_colision_tipo=self.PISO_COLISION,
+            tipo_colisiones=self.TIPO_COLISIONES,
         )
 
     def renderizar(self):
         self.nivel.dibujar()
+        self.jugador.dibujar_walter_cam(self.pantalla, self.camara)
 
     def manejar_eventos(self):
+        self.jugador.bloquear_rotacion()
 
         self.nivel.space.on_collision(
             self.JUGADOR_COLISION,
@@ -45,9 +44,8 @@ class Juego:
             begin=self.jugador.set_esta_en_piso,
         )
 
+        # teclas que se dejan presionadas
         teclas_presionadas = pygame.key.get_pressed()
-        if teclas_presionadas[pygame.K_SPACE] and self.jugador.en_piso:
-            self.jugador.saltar()
 
         if teclas_presionadas[pygame.K_d]:
             self.jugador.mover("DER")
@@ -61,10 +59,17 @@ class Juego:
             if event.type == pygame.QUIT:
                 self.ejecutando = False
 
+            # teclas que se presionan una sola vez
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    self.jugador.activar_walter_cam()
+                if event.key == pygame.K_SPACE and self.jugador.en_piso:
+                    self.jugador.saltar()
+
     def ejecutar(self):
 
         jugador_posicion_inicial = (
-            self.ANCHO // 2,
+            self.ANCHO // 2 - (100),
             self.ALTO - (self.nivel.piso.radius + 50),
         )
         self.jugador.set_posicion_inicial(jugador_posicion_inicial)
@@ -78,7 +83,9 @@ class Juego:
             for _ in range(substeps):
                 self.nivel.space.step(1 / self.FPS / substeps)
 
-            self.camara.actualizar()
+            if not self.jugador.walter_cam:
+                self.camara.actualizar()
+
             pygame.display.flip()
             self.reloj.tick(self.FPS)
 
