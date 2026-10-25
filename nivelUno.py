@@ -1,9 +1,10 @@
 import pymunk
+from pymunk import pygame_util
 from obstaculo import Obstaculo
 
 
 class NivelUno:
-    def __init__(self, pantalla, camara, piso_colision_tipo):
+    def __init__(self, pantalla, camara, tipo_colisiones):
         self.camara = camara
         self.space = pymunk.Space()
         self.space.gravity = (0, 900)
@@ -19,11 +20,10 @@ class NivelUno:
         self.piso.elasticity = 0
         self.piso.friction = 0
         self.color_fondo = (0, 0, 0)
-        self.piso.collision_type = piso_colision_tipo
+        self.piso.collision_type = tipo_colisiones["PISO"]
 
         self.space.add(self.piso)
 
-        
         self.obstaculos = [
             Obstaculo(
                 space=self.space,
@@ -31,9 +31,21 @@ class NivelUno:
                     self.pantalla.width // 2 + 400,
                     self.pantalla.height - 100 - 50,
                 ),
-                colision_tipo=piso_colision_tipo,
-                dimension=(100, 100),
-            )
+                colision_tipo=tipo_colisiones["ENEMIGO"],
+                dimension=(75, 75),
+                masa=100,
+            ),
+            Obstaculo(
+                space=self.space,
+                posicion=(
+                    self.pantalla.width // 2,
+                    self.pantalla.height - 250,
+                ),
+                colision_tipo=tipo_colisiones["PARED"],
+                dimension=(50, 300),
+                estatico=True,
+                color=self.piso.color,
+            ),
         ]
 
     def agregar_a_space(self, *cuerpos):
