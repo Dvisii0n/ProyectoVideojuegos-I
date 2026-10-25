@@ -8,26 +8,33 @@ class Obstaculo:
         space,
         posicion,
         colision_tipo,
+        estatico=False,
         dimension=(100, 100),
+        masa=10,
         color=(200, 80, 60),
     ):
         self.dimension = dimension
         self.color = color
 
-        
-        self.cuerpo = pymunk.Body(body_type=pymunk.Body.STATIC)
+        if not estatico:
+            self.masa = masa
+            self.momento = pymunk.moment_for_box(self.masa, self.dimension)
+            self.cuerpo = pymunk.Body(self.masa, self.momento)
+        else:
+            self.cuerpo = pymunk.Body(body_type=pymunk.Body.STATIC)
+
         self.cuerpo.position = posicion
 
         self.forma = pymunk.Poly.create_box(self.cuerpo, self.dimension)
         self.forma.elasticity = 0
         self.forma.friction = 0
-        
+
         self.forma.collision_type = colision_tipo
 
         space.add(self.cuerpo, self.forma)
 
     def dibujar(self, pantalla, camara):
-        
+
         puntos = []
         for v in self.forma.get_vertices():
             mundo = self.cuerpo.local_to_world(v)
